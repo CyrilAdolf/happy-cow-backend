@@ -12,7 +12,7 @@ const isAuthenticated = require("../Middleware/isAuthenticated.js");
 const User = require("../models/User");
 
 // IMPORT CLOUDINARY
-var cloudinary = require("cloudinary").v2;
+const cloudinary = require("cloudinary").v2;
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_KEY,
@@ -137,7 +137,9 @@ router.post("/user/profile", async (req, res) => {
 // EDIT PROFILE
 // ISAUTHENTICATED MIDDLEWARE IS NEEDED
 router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
-  console.log(req.fields);
+  //   console.log("fields : ", req.fields);
+  //   console.log("user : ", req.user);
+  console.log("files : ", req.files.avatar.path);
   try {
     const {
       email,
@@ -145,33 +147,40 @@ router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
       veganStatus,
       birth,
       newsletter,
-      location,
+      lat,
+      lng,
     } = req.fields;
-    // const actualUser
-    if (email && username && veganStatus && birth && newsletter && location) {
+    const actualUser = req.user;
+
+    if (email && username && veganStatus && birth && newsletter && lat && lng) {
       // UPDATE PROFILE
 
-      const updatedProfile = new User({
-        email,
-        account: {
-          username,
-          veganStatus,
-          birth,
-          newsletter,
-          // avatar,
-          location,
-        },
-        token: req.user.token,
-        hash: req.user.hash,
-        salt: req.user.salt,
-      });
-      await updatedProfile.save();
-      res.status(200).json({
-        updatedProfile,
-      });
-    }
+      actualUser.email = email;
+      actualUser.account.username = username;
+      actualUser.account.veganStatus = veganStatus;
+      actualUser.account.birth = birth;
+      actualUser.account.newsletter = newsletter;
+      actualUser.account.location.lat = lat;
+      actualUser.account.location.lng = lng;
 
-    // const reponse = await cloudinary.v2.uploader.upload();
+      //   SAVE AVATAR IN CLOUDINARY
+      const avatarUpload = await cloudinary.uploader.upload(
+        req.files.avatar.path,
+        {
+          folder: `api/happycow/avatar/${actualUser._id}`,
+          public_id: "preview",
+        }
+      );
+
+      actualUser.account.avatar = avatarUpload.secure_url;
+
+      await actualUser.save();
+      res.status(200).json({
+        actualUser,
+      });
+    } else {
+      console.log("Missing Parameters");
+    }
   } catch (error) {
     console.log(error.message);
     res.status(400).json({
@@ -179,4 +188,5 @@ router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
     });
   }
 });
+
 module.exports = router;
