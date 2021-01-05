@@ -139,7 +139,7 @@ router.post("/user/profile", async (req, res) => {
 router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
   //   console.log("fields : ", req.fields);
   //   console.log("user : ", req.user);
-  console.log("files : ", req.files.avatar.path);
+  // console.log("files : ", req.files.avatar.path);
   try {
     const {
       email,
