@@ -169,9 +169,8 @@ router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
             public_id: "preview",
           }
         );
+        actualUser.account.avatar = avatarUpload.secure_url;
       }
-
-      actualUser.account.avatar = avatarUpload.secure_url;
 
       await actualUser.save();
       res.status(200).json({
