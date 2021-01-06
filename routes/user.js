@@ -137,8 +137,6 @@ router.post("/user/profile", async (req, res) => {
 // EDIT PROFILE
 // ISAUTHENTICATED MIDDLEWARE IS NEEDED
 router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
-  console.log("avatar : ", req.files.avatar);
-  console.log("path : ", req.files.avatar.path);
   try {
     const {
       email,
@@ -163,7 +161,7 @@ router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
       actualUser.account.location.lng = lng;
 
       //   SAVE AVATAR IN CLOUDINARY
-      if (req.files.avatar) {
+      if (req.files.avatar !== undefined) {
         const avatarUpload = await cloudinary.uploader.upload(
           req.files.avatar.path,
           {
