@@ -137,9 +137,8 @@ router.post("/user/profile", async (req, res) => {
 // EDIT PROFILE
 // ISAUTHENTICATED MIDDLEWARE IS NEEDED
 router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
-  console.log(req.files);
-  console.log(req.files.avatar);
-  console.log(req.files.avatar.path);
+  console.log("avatar : ", req.files.avatar);
+  console.log("path : ", req.files.avatar.path);
   try {
     const {
       email,
