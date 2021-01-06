@@ -137,9 +137,6 @@ router.post("/user/profile", async (req, res) => {
 // EDIT PROFILE
 // ISAUTHENTICATED MIDDLEWARE IS NEEDED
 router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
-  //   console.log("fields : ", req.fields);
-  //   console.log("user : ", req.user);
-  // console.log("files : ", req.files.avatar.path);
   try {
     const {
       email,
@@ -164,13 +161,15 @@ router.post("/user/updateprofile", isAuthenticated, async (req, res) => {
       actualUser.account.location.lng = lng;
 
       //   SAVE AVATAR IN CLOUDINARY
-      const avatarUpload = await cloudinary.uploader.upload(
-        req.files.avatar.path,
-        {
-          folder: `api/happycow/avatar/${actualUser._id}`,
-          public_id: "preview",
-        }
-      );
+      if (req.files.avatar.path) {
+        const avatarUpload = await cloudinary.uploader.upload(
+          req.files.avatar.path,
+          {
+            folder: `api/happycow/avatar/${actualUser._id}`,
+            public_id: "preview",
+          }
+        );
+      }
 
       actualUser.account.avatar = avatarUpload.secure_url;
 
